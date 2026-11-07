@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Cancel superseded runs on the same branch/PR.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  check:
+    name: fmt, clippy, test, build
+    # Vitals is a Win32 application; it does not compile anywhere else.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check formatting
+        run: cargo fmt --all --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Test
+        run: cargo test --all-features
+
+      - name: Release build
+        run: cargo build --release --locked
+
+      - name: Smoke test the GPU helper
+        shell: pwsh
+        run: |
+          # Runners have no NVIDIA GPU, so the helper must report that and
+          # exit with code 2 (init failed) instead of crashing or hanging.
+          $p = Start-Process target/release/vitals.exe -ArgumentList '--gpu-helper', '1000' `
+            -RedirectStandardOutput helper.txt -PassThru -NoNewWindow
+          if (-not $p.WaitForExit(15000)) { $p.Kill(); throw 'GPU helper did not exit within 15 s' }
+          Get-Content helper.txt
+          if ($p.ExitCode -ne 2) { throw "expected exit code 2, got $($p.ExitCode)" }
+          if (-not (Select-String -Path helper.txt -Pattern '^E ' -Quiet)) { throw 'no error line printed' }
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: vitals-${{ github.sha }}
+          path: target/release/vitals.exe
+          if-no-files-found: error

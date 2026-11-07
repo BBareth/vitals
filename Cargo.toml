@@ -1,0 +1,24 @@
+[package]
+name = "vitals"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+description = "A hotkey hardware-stats panel for Windows: CPU, NVIDIA GPU, memory and NVMe temperatures, with no kernel driver."
+license = "MIT"
+repository = "https://github.com/BBareth/vitals"
+readme = "README.md"
+keywords = ["windows", "hardware-monitor", "overlay", "nvml", "direct2d"]
+categories = ["visualization", "os::windows-apis"]
+publish = false
+
+[dependencies]
+nvml-wrapper = "0.12.1"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+toml = "1.1.4"
+windows = { version = "0.62.2", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_Graphics_Direct2D", "Win32_Graphics_Direct2D_Common", "Win32_Graphics_DirectWrite", "Win32_Graphics_Dxgi_Common", "Win32_UI_WindowsAndMessaging", "Win32_UI_Shell", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_HiDpi", "Win32_UI_Controls", "Win32_System_LibraryLoader", "Win32_System_Threading", "Win32_System_SystemInformation", "Win32_System_Performance", "Win32_System_IO", "Win32_System_Ioctl", "Win32_System_Com", "Win32_System_ProcessStatus", "Win32_System_Registry", "Win32_System_Kernel", "Win32_System_SystemServices", "Win32_Storage_FileSystem", "Win32_NetworkManagement_IpHelper", "Win32_Networking_WinSock", "Win32_System_Diagnostics_Debug", "Win32_System_Memory", "Win32_NetworkManagement_Ndis", "Win32_Security", "Win32_Graphics_Imaging", "Win32_UI_Shell_Common", "Win32_System_JobObjects", "Win32_System_ErrorReporting"] }
+
+[features]
+# Test hook: the GPU helper raises a real access violation after
+# VITALS_GPU_CRASH_AFTER samples (default 5). Never enabled in the shipped build.
+crash-test = []
