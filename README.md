@@ -24,7 +24,7 @@ toggles it with `Win+Alt+O`. Think of the Game Bar's performance widget, but
 permanent, readable from across the room, and with real sensor data.
 
 <p align="center">
-  <img src="./docs/panel.png" width="306" alt="The Vitals panel showing CPU, GPU, memory and storage readings">
+  <img src="./docs/panel.png" width="300" alt="The Vitals panel showing CPU, GPU, memory and storage readings">
 </p>
 
 - **CPU**: load, real turbo clock, package temperature, and the mainboard
